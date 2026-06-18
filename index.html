@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SignSpeak — Indian Sign Language Translator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🤟</span>
+      <div>
+        <h1>SignSpeak</h1>
+        <p class="tagline">Real-time Indian Sign Language → text &amp; speech</p>
+      </div>
+    </div>
+    <div class="status" id="status">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Loading hand-tracking model…</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Camera + overlay -->
+    <section class="stage">
+      <div class="video-wrap">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="prediction-badge" id="predBadge">
+          <span id="predLabel">—</span>
+          <div class="conf-track"><div class="conf-fill" id="confFill"></div></div>
+        </div>
+        <div class="hands-tag" id="handsTag">0 hands</div>
+      </div>
+
+      <div class="output-card">
+        <label class="section-label">Translation</label>
+        <div class="output-text" id="outputText" aria-live="polite"></div>
+        <div class="output-controls">
+          <button id="speakBtn" class="btn primary">🔊 Speak</button>
+          <button id="spaceBtn" class="btn">␣ Space</button>
+          <button id="backBtn" class="btn">⌫ Delete</button>
+          <button id="clearBtn" class="btn ghost">Clear</button>
+          <label class="toggle">
+            <input type="checkbox" id="autoSpeak" checked /> auto-speak
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Control panel -->
+    <aside class="panel">
+      <div class="mode-switch">
+        <button class="mode-btn active" data-mode="translate" id="modeTranslate">Translate</button>
+        <button class="mode-btn" data-mode="train" id="modeTrain">Train signs</button>
+      </div>
+
+      <!-- TRANSLATE MODE -->
+      <div class="mode-pane" id="paneTranslate">
+        <h2>How it works</h2>
+        <ol class="howto">
+          <li>The model tracks <b>21 points per hand</b> from your webcam.</li>
+          <li>It compares your hand shape to signs <b>you taught it</b>.</li>
+          <li>Hold a sign steady to commit it, then it’s spoken aloud.</li>
+        </ol>
+        <div class="hint" id="emptyHint">
+          ⚠️ No signs trained yet. Switch to <b>Train signs</b> and teach it a few
+          (try <code>HELLO</code>, <code>YES</code>, <code>NO</code>) — takes ~30 seconds.
+        </div>
+        <div class="tuning">
+          <label>Sensitivity
+            <input type="range" id="threshold" min="0.4" max="0.95" step="0.01" value="0.72" />
+          </label>
+          <label>Hold time
+            <input type="range" id="dwell" min="3" max="25" step="1" value="9" />
+          </label>
+        </div>
+      </div>
+
+      <!-- TRAIN MODE -->
+      <div class="mode-pane hidden" id="paneTrain">
+        <h2>Teach a sign</h2>
+        <div class="train-row">
+          <input type="text" id="labelInput" placeholder="Sign name (e.g. HELLO)" maxlength="24" />
+          <button id="recordBtn" class="btn primary">● Record</button>
+        </div>
+        <p class="micro">Type a name, make the sign, hold <b>Record</b> while you slightly
+        move/rotate your hands. Special names <code>SPACE</code> and <code>DELETE</code>
+        act as keys.</p>
+        <div class="rec-status hidden" id="recStatus">
+          Recording <b id="recLabel"></b> … <span id="recCount">0</span> samples
+        </div>
+      </div>
+
+      <!-- DATASET -->
+      <div class="dataset">
+        <div class="dataset-head">
+          <label class="section-label">Trained signs</label>
+          <span class="count-pill" id="totalSamples">0 samples</span>
+        </div>
+        <div class="chips" id="labelChips"></div>
+        <div class="dataset-controls">
+          <button id="exportBtn" class="btn ghost small">Export</button>
+          <button id="importBtn" class="btn ghost small">Import</button>
+          <button id="wipeBtn" class="btn ghost small danger">Wipe all</button>
+          <input type="file" id="importFile" accept="application/json" hidden />
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
